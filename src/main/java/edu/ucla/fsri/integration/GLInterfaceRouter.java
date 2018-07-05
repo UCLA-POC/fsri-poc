@@ -76,15 +76,6 @@ public class GLInterfaceRouter extends RouteBuilder {
 			//.to("file:output?fileName=${in.header.CorrelationID}-import-bulk-data-request-${date:now:yyyyMMddssS}.txt&fileExist=Append")
 			.to("file:output?fileName=${in.header.CorrelationID}-100-${date:now:yyyyMMddssS}.txt&fileExist=Append")
 			
-			//.wireTap("aws-sqs://audit-queue?amazonSQSClient=#amazonSQSClient", true, constant("Bye World"))
-			
-			/*
-			.wireTap("amqp:audit")
-			.process(exchange -> {
-                exchange.setProperty("fileName", "${in.header.CorrelationID}");
-            })
-            */
-			
 			//.to("aws-sqs://loadAndImportData-queue?amazonSQSClient=#amazonSQSClient")
 			.to("direct:loadAndImportData")
 			.log("5. Done processing the zip file: ${in.header.CorrelationID}");
@@ -102,7 +93,6 @@ public class GLInterfaceRouter extends RouteBuilder {
 		    .setHeader(Exchange.CONTENT_TYPE, constant("text/xml"))
 		    .log("2 POSTing the SOAP Request to Oracle Cloud: importBulkData")
 			.to("restlet:{{gl.interface.endpoint.url}}")
-			//.process(exchange -> log.info("4.1 The response code from Oracle Financials Cloud ErpIntegrationService is: {}", exchange.getIn().getHeader(Exchange.HTTP_RESPONSE_CODE)))
 			.convertBodyTo(String.class)
 			.transform()
 				.exchange(this::getSOAPResponse)
@@ -117,8 +107,6 @@ public class GLInterfaceRouter extends RouteBuilder {
 		//from("aws-sqs://essJobStatus-queue?amazonSQSClient=#amazonSQSClient")
 			.routeId("File-to-SOAP :: GetESSJobStatus Service")
 	        .to("velocity:getESSJobStatus.vm")
-			//.wireTap("aws-sqs://audit-queue?amazonSQSClient=#amazonSQSClient")
-	        //.to("file:output?fileName=essjobstatus-request-${in.header.CorrelationID}-${date:now:yyyyMMddssS}.txt")
 			.setHeader("Authorization", simple("Basic c2Jhc2F2YTpIdXJvbjEyMyE="))
 			.setHeader("Accept-Encoding", simple("gzip, deflate"))
 			.setHeader("SOAPAction", simple("http://xmlns.oracle.com/apps/financials/commonModules/shared/model/erpIntegrationService/getESSJobStatus"))
@@ -126,24 +114,16 @@ public class GLInterfaceRouter extends RouteBuilder {
 		    .setHeader(Exchange.CONTENT_TYPE, constant("text/xml"))
 		    .log("3 POSTing the SOAP Request to Oracle Cloud: getESSJobStatus")
 			.to("restlet:{{gl.interface.endpoint.url}}")
-			//.process(exchange -> log.info("4.2 The response code from Oracle Financials Cloud ErpIntegrationService is: {}", exchange.getIn().getHeader(Exchange.HTTP_RESPONSE_CODE)))
 			.convertBodyTo(String.class)
 			.transform()
 				.exchange(this::getSOAPResponse)
 			.to("file:output?fileName=${in.header.CorrelationID}-102-${date:now:yyyyMMddssS}.txt&fileExist=Append")
-			//.wireTap("aws-sqs://audit-queue?amazonSQSClient=#amazonSQSClient")
 	        .setBody(ns.xpath("//soap:Envelope/soap:Body/c:getESSJobStatusResponse/c:result/text()"))
 	        .convertBodyTo(String.class)
 	        .log("3.1 The response from Oracle Oracle Cloud: getESSJobStatus: ${body}")
 			//.wireTap("aws-sqs://audit-queue?amazonSQSClient=#amazonSQSClient")
 	        //.to("aws-sqs://essJobFinalStatus-queue?amazonSQSClient=#amazonSQSClient")
 			.to("file:output?fileName=${in.header.CorrelationID}-103-${date:now:yyyyMMddssS}.txt&fileExist=Append");
-			/*
-			.wireTap("amqp:audit")
-			.process(exchange -> {
-                exchange.setProperty("fileName", "${file:name.noext}");
-            });
-            */
 		
 		
 			from("file:output?noop=true&include=.*txt&delete=false")

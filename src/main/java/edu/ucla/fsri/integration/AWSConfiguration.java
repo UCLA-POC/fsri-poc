@@ -3,6 +3,7 @@
  */
 package edu.ucla.fsri.integration;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -23,20 +24,26 @@ import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
 @Configuration
 public class AWSConfiguration {
 
-		
-	   //private AWSCredentials awsCredentials = new BasicAWSCredentials(System.getProperty("accessKey"), System.getProperty("secretKey"));
+	@Value("${aws.access.key}")
+	private String AWS_ACCESS_KEY;
 
-	    @Bean public AmazonS3 amazonS3Client() {
-	    	AWSCredentials awsCredentials = new BasicAWSCredentials("AKIAILP6FFCHCOQQTWDQ", "TLQKbsdHBHiHWIVaxSeC8ULUP4mldXlHyVJz3ptN");
-            AWSCredentialsProvider credentialsProvider = new AWSStaticCredentialsProvider(awsCredentials);
-            AmazonS3ClientBuilder clientBuilder = AmazonS3ClientBuilder.standard().withRegion(Regions.US_WEST_2).withCredentials(credentialsProvider);
-            return clientBuilder.build();
-	    }
+	@Value("${aws.secret.key}")
+	private String AWS_SECRET_KEY;
 
-	    @Bean public AmazonSQS amazonSQSClient() {
-	    	AWSCredentials awsCredentials = new BasicAWSCredentials("AKIAILP6FFCHCOQQTWDQ", "TLQKbsdHBHiHWIVaxSeC8ULUP4mldXlHyVJz3ptN");
-            AWSCredentialsProvider credentialsProvider = new AWSStaticCredentialsProvider(awsCredentials);
-            AmazonSQSClientBuilder clientBuilder = AmazonSQSClientBuilder.standard().withRegion(Regions.US_WEST_2).withCredentials(credentialsProvider);
-            return clientBuilder.build();
-	    }
+
+	@Bean
+	public AmazonS3 amazonS3Client() {
+		AWSCredentials awsCredentials = new BasicAWSCredentials(AWS_ACCESS_KEY, AWS_SECRET_KEY);
+		AWSCredentialsProvider credentialsProvider = new AWSStaticCredentialsProvider(awsCredentials);
+		AmazonS3ClientBuilder clientBuilder = AmazonS3ClientBuilder.standard().withRegion(Regions.US_WEST_2).withCredentials(credentialsProvider);
+		return clientBuilder.build();
+	}
+
+	@Bean
+	public AmazonSQS amazonSQSClient() {
+		AWSCredentials awsCredentials = new BasicAWSCredentials(AWS_ACCESS_KEY, AWS_SECRET_KEY);
+		AWSCredentialsProvider credentialsProvider = new AWSStaticCredentialsProvider(awsCredentials);
+		AmazonSQSClientBuilder clientBuilder = AmazonSQSClientBuilder.standard().withRegion(Regions.US_WEST_2).withCredentials(credentialsProvider);
+		return clientBuilder.build();
+	}
 }
