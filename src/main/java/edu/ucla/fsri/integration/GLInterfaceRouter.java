@@ -39,11 +39,6 @@ public class GLInterfaceRouter extends RouteBuilder {
 
 	static Logger LOG = LoggerFactory.getLogger(GLInterfaceRouter.class);
 	
-    //public static String AMQP_URL = "amqps://b-cdddd1ff-58bc-4c68-98ab-6b558e2fcdc5-1.mq.us-west-2.amazonaws.com:5671";
-    //public static String BROKER_USERNAME = "fsri";
-    //public static String BROKER_PASSWORD = "f$R1d3m02018";
-
-	
 	@Value("${spring.activemq.broker-url}")
 	private String AMQP_URL;
 
@@ -62,20 +57,16 @@ public class GLInterfaceRouter extends RouteBuilder {
 		Namespaces ns = new Namespaces("c", "http://xmlns.oracle.com/apps/financials/commonModules/shared/model/erpIntegrationService/types/")
 							.add("soap", "http://schemas.xmlsoap.org/soap/envelope/");
 		
-		//from("file:input?noop=true&include=.*zip")
-		from("aws-s3://fsri-poc?amazonS3Client=#amazonS3Client&deleteAfterRead=true")
+		from("{{file.endpoint}}")
 			.routeId("File-to-SOAP :: Base64 Service")
 			.log("1. Base64 encode the input file... ${in.header.CamelAwsS3Key}")
-			//.setHeader("CamelFileName", constant("${in.header.CamelAwsS3Key}"))
 			.process()
 				.message(this::setValues)
 			.marshal().base64()
 			.convertBodyTo(String.class)
 			.setHeader("author", simple("Khaleel Thotti"))
 			.to("velocity:importBulkData.vm")
-			//.to("file:output?fileName=${in.header.CorrelationID}-import-bulk-data-request-${date:now:yyyyMMddssS}.txt&fileExist=Append")
 			.to("file:output?fileName=${in.header.CorrelationID}-100-${date:now:yyyyMMddssS}.txt&fileExist=Append")
-			
 			//.to("aws-sqs://loadAndImportData-queue?amazonSQSClient=#amazonSQSClient")
 			.to("direct:loadAndImportData")
 			.log("5. Done processing the zip file: ${in.header.CorrelationID}");
@@ -86,13 +77,13 @@ public class GLInterfaceRouter extends RouteBuilder {
 			.routeId("File-to-SOAP :: LoadAndImportData Service")
 			.tracing("true")
 			.convertBodyTo(String.class)
-			.setHeader("Authorization", simple("Basic c2Jhc2F2YTpIdXJvbjEyMyE="))
+			.setHeader("Authorization", simple("Basic {{erp.basic.auth}}"))
 			.setHeader("Accept-Encoding", simple("gzip, deflate"))
 			.setHeader("SOAPAction", simple("http://xmlns.oracle.com/apps/financials/commonModules/shared/model/erpIntegrationService/importBulkData"))
 			.setHeader(Exchange.HTTP_METHOD, constant("POST"))
 		    .setHeader(Exchange.CONTENT_TYPE, constant("text/xml"))
 		    .log("2 POSTing the SOAP Request to Oracle Cloud: importBulkData")
-			.to("restlet:{{gl.interface.endpoint.url}}")
+			.to("restlet:{{erp.endpoint.url}}")
 			.convertBodyTo(String.class)
 			.transform()
 				.exchange(this::getSOAPResponse)
