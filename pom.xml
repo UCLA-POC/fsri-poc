@@ -204,23 +204,6 @@
         </configuration>
       </plugin>
 
-	<!--  
-	<plugin>
-	    <groupId>br.com.ingenieux</groupId>
-	    <artifactId>beanstalk-maven-plugin</artifactId>
-	    <version>1.5.0</version>
-	    <configuration>
-	        <applicationName>fsri-poc</applicationName>
-	        <s3Bucket>fsri-poc-code</s3Bucket>
-			<s3Key>${project.artifactId}/${project.build.finalName}-${beanstalk.versionLabel}.jar</s3Key>
-			<versionsToKeep>5</versionsToKeep>
-	        <cnamePrefix>elasticbeanstalk-fsri-poc</cnamePrefix>
-	        <environmentName>fsripoc-dev</environmentName>
-	        <environmentRef>fsripoc-dev</environmentRef>
-	        <solutionStack>64bit Amazon Linux 2016.09 v2.4.0 running Java 8</solutionStack>
-	    </configuration>
-	</plugin> -->
-
     </plugins>
   </build>
 
