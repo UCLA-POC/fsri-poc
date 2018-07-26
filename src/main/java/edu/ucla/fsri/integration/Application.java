@@ -2,14 +2,11 @@ package edu.ucla.fsri.integration;
 
 import org.apache.camel.component.amqp.AMQPConnectionDetails;
 import org.apache.camel.component.servlet.CamelHttpTransportServlet;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.env.Environment;
 
 import io.hawt.config.ConfigFacade;
 import io.hawt.springboot.HawtPlugin;

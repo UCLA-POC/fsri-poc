@@ -1,8 +1,3 @@
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:typ="http://xmlns.oracle.com/apps/financials/commonModules/shared/model/erpIntegrationService/types/">
-   <soapenv:Header/>
-   <soapenv:Body>
-      <typ:getESSJobStatus>
-         <typ:requestId>${body}</typ:requestId>
-      </typ:getESSJobStatus>
-   </soapenv:Body>
-</soapenv:Envelope>
+ <types:getESSJobStatus xmlns:types="http://xmlns.oracle.com/apps/financials/commonModules/shared/model/erpIntegrationService/types/">
+ 	<types:requestId>${body}</types:requestId>
+ </types:getESSJobStatus>

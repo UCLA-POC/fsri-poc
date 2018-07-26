@@ -1,8 +1,8 @@
  __________________________
-< UCLA iPaaS with Oracle Financials Cloud >
+< UCLA iPaaS REST API Platform >
  --------------------------
         \   ^__^
          \  (oo)\_______
-            (__)\       )\/\
+          \ (__)\       )\/\
                 ||----w |
                 ||     ||
